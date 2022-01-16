@@ -9,6 +9,6 @@ COPY main.go .
 RUN go mod init && go mod tidy
 RUN go build -o /bin/httpserver
 
-FROM ubuntu
+FROM scratch
 COPY --from=build /bin/httpserver /bin/httpserver
 ENTRYPOINT ["/bin/httpserver"]
