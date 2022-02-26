@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -9,7 +10,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"net/http/pprof"
@@ -32,10 +35,37 @@ func main() {
 	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
-	err := http.ListenAndServe(":80", mux)
-	if err != nil {
-		log.Fatal(err)
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	srv := &http.Server{
+		Addr:    ":80",
+		Handler: mux,
 	}
+
+	go func() {
+		err := srv.ListenAndServe()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	log.Print("Server started.")
+
+	<-done
+	log.Print("Server Stopped.")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		// extra handling here
+		cancel()
+	}()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server Shutdown Failed:%+v", err)
+	}
+	log.Print("Server Exited Properly")
 
 }
 
@@ -43,15 +73,15 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	//io.WriteString(w, "ok\n")
 	//w.Header().Set("Location", "https://www.baidu.com")
 	//w.WriteHeader(301)
-	v := os.Getenv("VERSION")
-	if v == "" {
-		v = "VERSION NOT FOUND"
-	}
-	w.Header().Add("VERSION", v)
-	for k, v := range r.Header {
-		stringV := strings.Join(v, ",")
-		w.Header().Add(k, stringV)
-	}
+	// v := os.Getenv("VERSION")
+	// if v == "" {
+	// 	v = "VERSION NOT FOUND"
+	// }
+	// w.Header().Add("VERSION", v)
+	// for k, v := range r.Header {
+	// 	stringV := strings.Join(v, ",")
+	// 	w.Header().Add(k, stringV)
+	// }
 	w.Write([]byte("OK"))
 	fmt.Println(time.Now(), r.URL, http.StatusOK)
 }
@@ -73,11 +103,10 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		statusCode = 404
 		w.Write([]byte("URL not found. Please double check."))
-
+	} else {
+		w.Write([]byte("Welcome to CNCAMP's http server."))
 	}
-	w.Write([]byte("Welcome to CNCAMP's http server."))
 	fmt.Println(time.Now(), ip, r.URL, statusCode, string(headerString))
-
 }
 
 // GetIP returns request real ip.
