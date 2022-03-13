@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: httpserver
-          image: joey100/cncamp-httpserver:v2.0
+          image: joey100/cncamp-httpserver:v2.0-metrics
           imagePullPolicy: Always
           ports:
             - containerPort: 80
