@@ -1,4 +1,4 @@
-module github.com/cncamp/joey/homework/cncamp
+module cncamp
 
 go 1.17
 
