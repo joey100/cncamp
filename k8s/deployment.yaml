@@ -11,6 +11,10 @@ spec:
       app: httpserver
   template:
     metadata:
+      annotations:
+        # for prometheus to automatically collect this pod's metric
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "80"
       labels:
         app: httpserver
     spec:
