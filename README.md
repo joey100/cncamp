@@ -55,3 +55,7 @@ Then you will get grafana login password, the login username is 'admin' on defau
 
 Login password is in secret `loki-grafana`
 
+
+## Metrics.go reference
+https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/pkg/utils/metrics/metrics.go
+
