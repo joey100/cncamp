@@ -19,7 +19,7 @@ import (
 	"net/http/pprof"
 	_ "net/http/pprof"
 
-	"github.com/cnncamp-homework/joey/homework/cncamp/httpserver/metrics"
+	"github.com/joey100/cncamp/httpserver/metrics"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
