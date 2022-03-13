@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -18,7 +19,9 @@ import (
 	"net/http/pprof"
 	_ "net/http/pprof"
 
+	"github.com/cnncamp-homework/joey/homework/cncamp/httpserver/metrics"
 	"github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -28,6 +31,8 @@ func main() {
 	c, python, java := true, false, "no!"
 	fmt.Println(c, python, java)
 	//err := http.ListenAndServe(":80", nil)
+
+	metrics.Register()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", rootHandler)
 	mux.HandleFunc("/healthz", healthz)
@@ -35,6 +40,7 @@ func main() {
 	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	mux.Handle("/metrics", promhttp.Handler())
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -86,7 +92,16 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now(), r.URL, http.StatusOK)
 }
 
+func randInt(min int, max int) int {
+	rand.Seed(time.Now().UTC().UnixNano())
+	return min + rand.Intn(max-min)
+}
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
+	timer := metrics.NewTimer()
+	defer timer.ObserveTotal()
+	delay := randInt(10, 2000)
+	time.Sleep(time.Millisecond * time.Duration(delay))
 	ip, _ := GetIP(r)
 	v := os.Getenv("VERSION")
 	if v == "" {
