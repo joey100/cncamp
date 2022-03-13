@@ -50,3 +50,10 @@ func CreateExecutionTimeMetric(namespace string, help string) *prometheus.Histog
 		}, []string{"step"},
 	)
 }
+
+
+type ExecutionTimer struct {
+	histo *prometheus.HistogramVec
+	start time.Time
+	last  time.Time
+}
