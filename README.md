@@ -78,8 +78,8 @@ istioctl install --set profile=demo -y
 ```sh
 kubectl create ns securesvc
 kubectl label ns securesvc istio-injection=enabled
-kubectl create -f deployment.yaml -n securesvc
-kubectl create -f service.yaml -n securesvc
+kubectl create -f k8s/deployment.yaml -n securesvc
+kubectl create -f k8s/service.yaml -n securesvc
 ```
 
 ```sh
@@ -97,3 +97,18 @@ curl --resolve httpsserver.cncamp.io:443:$INGRESS_IP -H "user: jesse" https://ht
 # below should not be OK
 curl --resolve httpsserver.cncamp.io:443:$INGRESS_IP -H "user: jesse1" https://httpsserver.cncamp.io/healthz -v -k
 ```
+
+### Tracing
+
+```sh
+kubectl apply -f k8s/jaeger.yaml
+kubectl edit configmap istio -n istio-system
+set tracing.sampling=100
+```
+
+#### Check tracing dashboard
+
+```sh
+istioctl dashboard jaeger --address 0.0.0.0
+```
+
