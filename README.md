@@ -59,3 +59,41 @@ Login password is in secret `loki-grafana`
 ## Metrics.go reference
 https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/pkg/utils/metrics/metrics.go
 
+
+
+
+## Istio traffic management
+
+### Install istio
+
+```sh
+curl -L https://istio.io/downloadIstio | sh -
+cd istio-1.13.2
+cp bin/istioctl /usr/local/bin
+istioctl install --set profile=demo -y
+```
+
+### Deploy httpsserver
+
+```sh
+kubectl create ns securesvc
+kubectl label ns securesvc istio-injection=enabled
+kubectl create -f deployment.yaml -n securesvc
+kubectl create -f service.yaml -n securesvc
+```
+
+```sh
+openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=cncamp Inc./CN=*.cncamp.io' -keyout cncamp.io.key -out cncamp.io.crt
+kubectl create -n istio-system secret tls cncamp-credential --key=cncamp.io.key --cert=cncamp.io.crt
+kubectl apply -f istio-specs.yaml -n securesvc
+```
+
+### Access httpsserver
+
+```sh
+export INGRESS_IP=`kubectl get svc istio-ingressgateway -n istio-system|awk 'NR!=1{print $3}'`
+# below should be OK
+curl --resolve httpsserver.cncamp.io:443:$INGRESS_IP -H "user: jesse" https://httpsserver.cncamp.io/healthz -v -k
+# below should not be OK
+curl --resolve httpsserver.cncamp.io:443:$INGRESS_IP -H "user: jesse1" https://httpsserver.cncamp.io/healthz -v -k
+```
