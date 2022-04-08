@@ -1,5 +1,5 @@
 namePrefix: kustomize-
-nameSuffix: -cncamp-argo-test
+nameSuffix: -cncamp-argocd-test
 resources:
 - deployment.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
