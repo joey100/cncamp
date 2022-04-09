@@ -1,0 +1,54 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: rollout-vsvc
+spec:
+  gateways:
+  - argo-rollouts
+  hosts:
+  - "test.com"
+  http:
+  - name: primary       # referenced in canary.trafficRouting.istio.virtualService.routes
+    match:
+      - headers:
+          end-user:
+            exact: "jason"
+    route:
+    - destination:
+        host: rollouts-demo
+        subset: stable  # referenced in canary.trafficRouting.istio.destinationRule.stableSubsetName
+      weight: 10
+    - destination:
+        host: rollouts-demo
+        subset: canary  # referenced in canary.trafficRouting.istio.destinationRule.canarySubsetName
+      weight: 90
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: rollout-destrule
+spec:
+  host: rollouts-demo
+  subsets:
+  - name: canary   # referenced in canary.trafficRouting.istio.destinationRule.canarySubsetName
+    labels:        # labels will be injected with canary rollouts-pod-template-hash value
+      app: rollouts-demo
+  - name: stable   # referenced in canary.trafficRouting.istio.destinationRule.stableSubsetName
+    labels:        # labels will be injected with stable rollouts-pod-template-hash value
+      app: rollouts-demo
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: argo-rollouts
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+      - "test.com"
+      port:
+        name: http-default
+        number: 80
+        protocol: HTTP
+---
