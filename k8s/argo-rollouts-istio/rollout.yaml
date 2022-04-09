@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-istio-demo
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      trafficRouting:
+        istio:
+          virtualService:
+            name: rollout-vsvc        # required
+            routes:
+            - primary                 # optional if there is a single route in VirtualService, required otherwise
+          destinationRule:
+            name: rollout-destrule    # required
+            canarySubsetName: canary  # required
+            stableSubsetName: stable  # required
+      steps:
+      - setWeight: 20
+      - pause: {}
+      - setWeight: 40
+      - pause: {duration: 10}
+      - setWeight: 60
+      - pause: {duration: 10}
+      - setWeight: 80
+      - pause: {duration: 10}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: rollouts-demo
+  template:
+    metadata:
+      labels:
+        app: rollouts-demo
+    spec:
+      containers:
+      - name: rollouts-demo
+        image: joey100/cncamp-httpserver:v2.0-metrics
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 50m
+          limits:
+            memory: 100Mi
+            cpu: 50m
