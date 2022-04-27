@@ -1,6 +1,12 @@
 ## Cloud Native Some Knowledge Summary
 
-云原生使得组织在各种公有云/私有云/混合云等现代的、动态环境下构建和运行可扩展的应用程序的能力，其典型技术包括容器化，微服务，服务网格，声明式API，不可变基础设施等。
+云原生技术有利于各组织在公有云、私有云和混合云等新型动态环境中，构建和运行可弹性扩展的应用。云原生的代表技术包括容器、服务网格、微服务、不可变基础设施和声明式API。
+
+这些技术能够构建容错性好、易于管理和便于观察的松耦合系统。结合可靠的自动化手段，云原生技术使工程师能够轻松地对系统作出频繁和可预测的重大变更。
+
+云原生计算基金会（CNCF）致力于培育和维护一个厂商中立的开源生态系统，来推广云原生技术。我们通过将最前沿的模式民主化，让这些创新为大众所用。
+
+Reference link: https://github.com/cncf/toc/blob/main/DEFINITION.md
 
 ### containerization
 
@@ -56,6 +62,11 @@ AUFS
 /var/lib/docker/aufs/mnt
 
 
+  
+### Modernization
+  
+  
+  
 ### Kubernetes
 
 架构设计原则
@@ -105,7 +116,26 @@ istio authentication/authorization
 
 
 
+### DevOps
+Through six years of research, the DevOps Research and Assessment (DORA) team has identified four key metrics that indicate the performance of software delivery. Four Keys allows you to collect data from your development environment (such as GitHub or GitLab) and compiles it into a dashboard displaying these key metrics.
+
+These four key metrics are:
+
+Deployment Frequency
+Lead Time for Changes
+Time to Restore Services
+Change Failure Rate  
+
+Reference link: https://github.com/GoogleCloudPlatform/fourkeys
+
+
+职责：  
+大规模运行和管理您的基础设施及开发流程
+加快软件开发和交付的速度
+消除开发团队与运维团队之间的壁垒 
 
 
 
-
+  
+### SRE  
+  
