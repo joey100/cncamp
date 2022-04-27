@@ -8,7 +8,7 @@
 
 Reference link: https://github.com/cncf/toc/blob/main/DEFINITION.md
 
-### containerization
+### Containerization
 
 容器技术的核心功能，就是通过约束和修改进程的动态表现，从而为其创造出一个“边界”。对于 Docker 等大多数 Linux 容器来说，Cgroups 技术是用来制造约束的主要手段，而 Namespace 技术则是用来修改进程视图的主要方法。
 
